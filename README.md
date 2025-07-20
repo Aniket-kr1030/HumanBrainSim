@@ -43,14 +43,13 @@ can simply rely on the printed metrics.
 
 For a simple text-only interface without camera or microphone, launch with
 the `--text` option. Type your messages and the model processes them
-through the cortex and hippocampus. When the acetylcholine level is high
-enough, the activations are stored in memory. Replies are retrieved using
-cosine similarity over stored activations and average the top three matches.
-The selected sentence is combined with a short Markov-chain continuation so
-the agent adds its own thoughts. The Markov model starts with a small generic
-corpus ("hello there", "how are you doing today", etc.) and learns new
-transitions from your conversation, avoiding the repeated "demo" replies seen
-in earlier versions. Enter `quit` or `exit` to stop the program.
+through the cortex and hippocampus. When the acetylcholine level is high enough,
+the activations are stored in memory. Replies are retrieved using cosine
+similarity over stored activations and average the top three matches. A small
+Markov model runs in the background to suggest new phrases, but those phrases
+are routed back through the cortex before influencing the final output so
+responses always originate from the brain model itself. Enter `quit` or `exit`
+to stop the program.
 The input text is converted to a simple letter-frequency vector before entering
 the cortex, mimicking an early sensory preprocessing stage.
 
