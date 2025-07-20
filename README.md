@@ -30,8 +30,10 @@ For real-time two-way speech and camera interaction, run:
 ```bash
 python run_model.py --config config.yaml --speech --camera
 ```
-The program will run indefinitely until you press `Ctrl+C`. Use the `--steps`
-flag to limit the number of cycles when testing.
+The program will run indefinitely until you press `Ctrl+C`. A small window
+shows the live camera feed with the current audio amplitude and TD-error
+overlaid as text so you can visually monitor what the model is sensing.
+Use the `--steps` flag to limit the number of cycles when testing.
 
 ### Hardware acceleration
 

@@ -10,6 +10,13 @@ from .lifelong import LifelongLearningModule
 from .interneuron_microcircuit import InterneuronMicrocircuitModule
 from .dashboard import DashboardServer
 from .speech import SpeechRecognitionModule, TextToSpeechModule
+from .hardware_interface import (
+    open_camera,
+    read_frame,
+    show_frame,
+    close_camera,
+    record_audio,
+)
 
 __all__ = [
     "HierarchicalBrainModel",
@@ -23,4 +30,9 @@ __all__ = [
     "DashboardServer",
     "SpeechRecognitionModule",
     "TextToSpeechModule",
+    "open_camera",
+    "read_frame",
+    "show_frame",
+    "close_camera",
+    "record_audio",
 ]

@@ -32,12 +32,21 @@ def main():
         model.adjust_capacity(args.capacity)
     model.dashboard.launch()
 
-    cam_thread = None
+    cap = None
+    read_frame = None
+    show_frame = None
+    close_camera = None
     if args.camera:
-        from brain_model.hardware_interface import camera_capture
-        import threading
-        cam_thread = threading.Thread(target=camera_capture, daemon=True)
-        cam_thread.start()
+        from brain_model.hardware_interface import (
+            open_camera,
+            read_frame as _read,
+            show_frame as _show,
+            close_camera as _close,
+        )
+        cap = open_camera()
+        read_frame = _read
+        show_frame = _show
+        close_camera = _close
 
     stt = None
     tts = None
@@ -51,26 +60,41 @@ def main():
     step = 0
     try:
         while True if args.steps < 0 else step < args.steps:
+            frame = None
+            amplitude = None
             if args.speech:
-                audio = record_audio(duration=2.0)
+                audio, amplitude = record_audio(duration=2.0)
                 text = stt.transcribe(audio)
-                x = np.frombuffer(text.encode('utf-8'), dtype=np.uint8)[:cfg['input_dim']]
-                if x.size < cfg['input_dim']:
-                    x = np.pad(x, (0, cfg['input_dim'] - x.size))
+                x = np.frombuffer(text.encode("utf-8"), dtype=np.uint8)[: cfg["input_dim"]]
+                if x.size < cfg["input_dim"]:
+                    x = np.pad(x, (0, cfg["input_dim"] - x.size))
                 x = x.astype(float) / 255.0
-                next_x = np.random.randn(cfg['input_dim'])
+                next_x = np.random.randn(cfg["input_dim"])
                 out = model.step(x, reward=0.0, next_x=next_x)
                 tts.speak(text)
             elif args.spontaneous:
                 out = model.step_spontaneous()
             else:
-                x = np.random.randn(cfg['input_dim'])
-                next_x = np.random.randn(cfg['input_dim'])
+                x = np.random.randn(cfg["input_dim"])
+                next_x = np.random.randn(cfg["input_dim"])
                 out = model.step(x, reward=0.0, next_x=next_x)
-            print('step', step, 'td', out['td_error'], 'penalty', out['penalty'])
+
+            if args.camera:
+                frame = read_frame(cap)
+                show_text = None
+                if amplitude is not None:
+                    show_text = f"amp:{amplitude:.2f} td:{out['td_error']:.2f}"
+                else:
+                    show_text = f"td:{out['td_error']:.2f}"
+                show_frame(frame, show_text)
+
+            print("step", step, "td", out["td_error"], "penalty", out["penalty"])
             step += 1
     except KeyboardInterrupt:
         pass
+    finally:
+        if cap:
+            close_camera(cap)
 
 if __name__ == '__main__':
     main()
