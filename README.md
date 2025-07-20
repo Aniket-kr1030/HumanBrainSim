@@ -39,9 +39,11 @@ SSH or without GUI support), the program now continues headlessly and you
 can simply rely on the printed metrics.
 
 For a simple text-only interface without camera or microphone, launch with
-the `--text` option. Type your messages and the model will respond by
-recalling the most similar sentence stored in its hippocampal memory using
-cosine similarity. Enter `quit` or `exit` to stop the program.
+the `--text` option. Type your messages and the model processes them
+through the cortex and hippocampus. When the acetylcholine level is high
+enough, the activations are stored in memory. Responses combine the closest
+recalled sentence with a short Markov-chain continuation so the agent adds
+its own thoughts. Enter `quit` or `exit` to stop the program.
 
 ```bash
 python run_model.py --config config.yaml --text

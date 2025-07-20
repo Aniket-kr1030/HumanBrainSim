@@ -67,8 +67,10 @@ class HierarchicalBrainModel:
         self.dopamine.step(td_error)
         ach_level = self.ach.step(0.0)
 
+        stored = False
         if ach_level > self.ach_thresh:
             self.hippocampus.store(activations)
+            stored = True
 
         recall = self.hippocampus.recall(activations)
         penalty = self.lifelong.compute_ewc_penalty(self.cortex.layers[-1].weights)
@@ -79,6 +81,7 @@ class HierarchicalBrainModel:
             "td_error": td_error,
             "recall": recall,
             "penalty": penalty,
+            "stored": stored,
         }
 
     def run_dataset(self, loader, reward_fn):

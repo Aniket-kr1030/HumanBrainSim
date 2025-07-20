@@ -4,6 +4,7 @@ import numpy as np
 from brain_model.brain import HierarchicalBrainModel
 from brain_model.speech import SpeechRecognitionModule, TextToSpeechModule
 from brain_model.brain_responder import BrainResponder
+from brain_model.text_gen import MarkovResponder
 
 
 def main():
@@ -55,6 +56,7 @@ def main():
     tts = None
     record_audio = None
     responder = BrainResponder()
+    markov = MarkovResponder()
     if args.speech:
         from brain_model.hardware_interface import record_audio as _rec
         stt = SpeechRecognitionModule()
@@ -79,8 +81,12 @@ def main():
                 x = x.astype(float) / 255.0
                 next_x = np.random.randn(cfg["input_dim"])
                 out = model.step(x, reward=0.0, next_x=next_x)
-                responder.add(out["activations"], user_text)
-                response = responder.respond(out["recall"])
+                if out["stored"]:
+                    responder.add(out["activations"], user_text)
+                    markov.add_sentence(user_text)
+                recall_resp = responder.respond(out["recall"])
+                gen_resp = markov.generate()
+                response = f"{recall_resp} {gen_resp}".strip()
                 print("Model:", response)
                 if args.speech:
                     tts.speak(response)
@@ -94,8 +100,12 @@ def main():
                 next_x = np.random.randn(cfg["input_dim"])
                 out = model.step(x, reward=0.0, next_x=next_x)
                 if text:
-                    responder.add(out["activations"], text)
-                    response = responder.respond(out["recall"])
+                    if out["stored"]:
+                        responder.add(out["activations"], text)
+                        markov.add_sentence(text)
+                    recall_resp = responder.respond(out["recall"])
+                    gen_resp = markov.generate()
+                    response = f"{recall_resp} {gen_resp}".strip()
                     tts.speak(response)
             elif args.spontaneous:
                 out = model.step_spontaneous()
