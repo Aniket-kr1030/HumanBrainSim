@@ -14,6 +14,7 @@ def main():
                         help='compute device: cpu, mps (Metal), or ne (Neural Engine)')
     parser.add_argument('--speech', action='store_true', help='use speech input and output')
     parser.add_argument('--camera', action='store_true', help='show live camera feed')
+    parser.add_argument('--text', action='store_true', help='interactive text input')
     parser.add_argument('--steps', type=int, default=-1,
                         help='number of steps to run (-1 for infinite)')
     args = parser.parse_args()
@@ -63,7 +64,24 @@ def main():
         while True if args.steps < 0 else step < args.steps:
             frame = None
             amplitude = None
-            if args.speech:
+            if args.text:
+                try:
+                    user_text = input("You: ")
+                except EOFError:
+                    break
+                if user_text.lower() in {"quit", "exit"}:
+                    break
+                x = np.frombuffer(user_text.encode("utf-8"), dtype=np.uint8)[: cfg["input_dim"]]
+                if x.size < cfg["input_dim"]:
+                    x = np.pad(x, (0, cfg["input_dim"] - x.size))
+                x = x.astype(float) / 255.0
+                next_x = np.random.randn(cfg["input_dim"])
+                out = model.step(x, reward=0.0, next_x=next_x)
+                response = "Echo: " + user_text
+                print("Model:", response)
+                if args.speech:
+                    tts.speak(response)
+            elif args.speech:
                 audio, amplitude = record_audio(duration=2.0)
                 text = stt.transcribe(audio)
                 x = np.frombuffer(text.encode("utf-8"), dtype=np.uint8)[: cfg["input_dim"]]
@@ -72,7 +90,8 @@ def main():
                 x = x.astype(float) / 255.0
                 next_x = np.random.randn(cfg["input_dim"])
                 out = model.step(x, reward=0.0, next_x=next_x)
-                tts.speak(text)
+                if text:
+                    tts.speak(text)
             elif args.spontaneous:
                 out = model.step_spontaneous()
             else:

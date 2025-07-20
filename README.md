@@ -38,6 +38,14 @@ If OpenCV fails to display the camera window (for example when running via
 SSH or without GUI support), the program now continues headlessly and you
 can simply rely on the printed metrics.
 
+For a simple text-only interface without camera or microphone, launch with
+the `--text` option. Type your messages and the model will echo a response
+until you type `quit` or `exit`.
+
+```bash
+python run_model.py --config config.yaml --text
+```
+
 ### Hardware acceleration
 
 Use the `--device` option to select the compute backend. Valid choices are:
