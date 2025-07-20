@@ -25,11 +25,13 @@ python run_model.py --config config.yaml --capacity 1.5
 
 During execution a minimal dashboard prints updates about reward and EWC penalty.
 
-For basic speech input and output using your microphone and speakers, run:
+For real-time two-way speech and camera interaction, run:
 
 ```bash
-python run_model.py --config config.yaml --speech
+python run_model.py --config config.yaml --speech --camera
 ```
+The program will run indefinitely until you press `Ctrl+C`. Use the `--steps`
+flag to limit the number of cycles when testing.
 
 ### Hardware acceleration
 
