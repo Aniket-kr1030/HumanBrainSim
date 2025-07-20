@@ -34,6 +34,9 @@ The program will run indefinitely until you press `Ctrl+C`. A small window
 shows the live camera feed with the current audio amplitude and TD-error
 overlaid as text so you can visually monitor what the model is sensing.
 Use the `--steps` flag to limit the number of cycles when testing.
+If OpenCV fails to display the camera window (for example when running via
+SSH or without GUI support), the program now continues headlessly and you
+can simply rely on the printed metrics.
 
 ### Hardware acceleration
 

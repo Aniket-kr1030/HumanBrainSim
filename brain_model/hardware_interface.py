@@ -6,6 +6,8 @@ except Exception:  # pragma: no cover - audio optional
     sd = None
 import threading
 
+_disable_imshow = False
+
 
 def open_camera():
     """Open the default camera and return the capture object."""
@@ -23,7 +25,12 @@ def read_frame(cap):
 
 
 def show_frame(frame, text=None):
-    """Display a frame with optional overlay text."""
+    """Display a frame with optional overlay text.
+
+    This function catches ``cv2.error`` so that GUI issues do not
+    terminate the program. This is helpful when OpenCV's highGUI
+    backend fails on certain macOS setups or headless environments.
+    """
     if frame is None:
         return
     if text:
@@ -36,8 +43,16 @@ def show_frame(frame, text=None):
             (0, 255, 0),
             2,
         )
-    cv2.imshow("camera", frame)
-    cv2.waitKey(1)
+    global _disable_imshow
+    if _disable_imshow:
+        return
+    try:
+        cv2.imshow("camera", frame)
+        cv2.waitKey(1)
+    except cv2.error:
+        # When GUI support is unavailable, disable further display calls
+        _disable_imshow = True
+
 
 
 def close_camera(cap):

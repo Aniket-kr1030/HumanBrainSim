@@ -31,6 +31,7 @@ def main():
     if args.capacity != 1.0:
         model.adjust_capacity(args.capacity)
     model.dashboard.launch()
+    print("Press Ctrl+C to stop the program")
 
     cap = None
     read_frame = None
