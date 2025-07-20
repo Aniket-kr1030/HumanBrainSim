@@ -3,6 +3,26 @@ import yaml
 import numpy as np
 from brain_model.brain import HierarchicalBrainModel
 from brain_model.speech import SpeechRecognitionModule, TextToSpeechModule
+import random
+
+
+def generate_response(text: str) -> str:
+    """Return a very simple rule-based reply."""
+    t = text.strip().lower()
+    if not t:
+        return "I'm listening."
+    greetings = {"hello", "hi", "hey"}
+    if any(g in t for g in greetings):
+        return random.choice([
+            "Hello!", "Hi there!", "Hey, how can I help?",
+        ])
+    if t.endswith("?"):
+        return "That's an interesting question."
+    if "bye" in t:
+        return "Goodbye!"
+    return random.choice([
+        "I see.", "Tell me more.", "Interesting.",
+    ])
 
 
 def main():
@@ -77,7 +97,7 @@ def main():
                 x = x.astype(float) / 255.0
                 next_x = np.random.randn(cfg["input_dim"])
                 out = model.step(x, reward=0.0, next_x=next_x)
-                response = "Echo: " + user_text
+                response = generate_response(user_text)
                 print("Model:", response)
                 if args.speech:
                     tts.speak(response)
@@ -91,7 +111,8 @@ def main():
                 next_x = np.random.randn(cfg["input_dim"])
                 out = model.step(x, reward=0.0, next_x=next_x)
                 if text:
-                    tts.speak(text)
+                    response = generate_response(text)
+                    tts.speak(response)
             elif args.spontaneous:
                 out = model.step_spontaneous()
             else:
