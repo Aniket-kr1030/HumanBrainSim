@@ -49,6 +49,8 @@ cosine similarity over stored activations and average the top three matches.
 The selected sentence is combined with a short Markov-chain continuation so
 the agent adds
 its own thoughts. Enter `quit` or `exit` to stop the program.
+The input text is converted to a simple letter-frequency vector before entering
+the cortex, mimicking an early sensory preprocessing stage.
 
 ```bash
 python run_model.py --config config.yaml --text

@@ -5,6 +5,7 @@ from brain_model.brain import HierarchicalBrainModel
 from brain_model.speech import SpeechRecognitionModule, TextToSpeechModule
 from brain_model.brain_responder import BrainResponder
 from brain_model.text_gen import MarkovResponder
+from brain_model.preprocessing import text_to_vector
 
 
 def main():
@@ -75,10 +76,7 @@ def main():
                     break
                 if user_text.lower() in {"quit", "exit"}:
                     break
-                x = np.frombuffer(user_text.encode("utf-8"), dtype=np.uint8)[: cfg["input_dim"]]
-                if x.size < cfg["input_dim"]:
-                    x = np.pad(x, (0, cfg["input_dim"] - x.size))
-                x = x.astype(float) / 255.0
+                x = text_to_vector(user_text, cfg["input_dim"])
                 next_x = np.random.randn(cfg["input_dim"])
                 out = model.step(x, reward=0.0, next_x=next_x)
                 if out["stored"]:
@@ -93,10 +91,7 @@ def main():
             elif args.speech:
                 audio, amplitude = record_audio(duration=2.0)
                 text = stt.transcribe(audio)
-                x = np.frombuffer(text.encode("utf-8"), dtype=np.uint8)[: cfg["input_dim"]]
-                if x.size < cfg["input_dim"]:
-                    x = np.pad(x, (0, cfg["input_dim"] - x.size))
-                x = x.astype(float) / 255.0
+                x = text_to_vector(text, cfg["input_dim"])
                 next_x = np.random.randn(cfg["input_dim"])
                 out = model.step(x, reward=0.0, next_x=next_x)
                 if text:

@@ -12,6 +12,7 @@ from .dashboard import DashboardServer
 from .speech import SpeechRecognitionModule, TextToSpeechModule
 from .text_gen import MarkovResponder
 from .brain_responder import BrainResponder
+from .preprocessing import text_to_vector, frame_to_vector
 from .hardware_interface import (
     open_camera,
     read_frame,
@@ -34,6 +35,8 @@ __all__ = [
     "TextToSpeechModule",
     "MarkovResponder",
     "BrainResponder",
+    "text_to_vector",
+    "frame_to_vector",
     "open_camera",
     "read_frame",
     "show_frame",
