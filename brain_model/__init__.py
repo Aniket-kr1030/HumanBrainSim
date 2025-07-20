@@ -11,6 +11,7 @@ from .interneuron_microcircuit import InterneuronMicrocircuitModule
 from .dashboard import DashboardServer
 from .speech import SpeechRecognitionModule, TextToSpeechModule
 from .text_gen import MarkovResponder
+from .brain_responder import BrainResponder
 from .hardware_interface import (
     open_camera,
     read_frame,
@@ -32,6 +33,7 @@ __all__ = [
     "SpeechRecognitionModule",
     "TextToSpeechModule",
     "MarkovResponder",
+    "BrainResponder",
     "open_camera",
     "read_frame",
     "show_frame",

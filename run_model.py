@@ -3,7 +3,7 @@ import yaml
 import numpy as np
 from brain_model.brain import HierarchicalBrainModel
 from brain_model.speech import SpeechRecognitionModule, TextToSpeechModule
-from brain_model.text_gen import MarkovResponder
+from brain_model.brain_responder import BrainResponder
 
 
 def main():
@@ -54,7 +54,7 @@ def main():
     stt = None
     tts = None
     record_audio = None
-    responder = MarkovResponder()
+    responder = BrainResponder()
     if args.speech:
         from brain_model.hardware_interface import record_audio as _rec
         stt = SpeechRecognitionModule()
@@ -79,9 +79,8 @@ def main():
                 x = x.astype(float) / 255.0
                 next_x = np.random.randn(cfg["input_dim"])
                 out = model.step(x, reward=0.0, next_x=next_x)
-                responder.add_sentence(user_text)
-                response = responder.generate()
-                responder.add_sentence(response)
+                responder.add(out["activations"], user_text)
+                response = responder.respond(out["recall"])
                 print("Model:", response)
                 if args.speech:
                     tts.speak(response)
@@ -95,9 +94,8 @@ def main():
                 next_x = np.random.randn(cfg["input_dim"])
                 out = model.step(x, reward=0.0, next_x=next_x)
                 if text:
-                    responder.add_sentence(text)
-                    response = responder.generate()
-                    responder.add_sentence(response)
+                    responder.add(out["activations"], text)
+                    response = responder.respond(out["recall"])
                     tts.speak(response)
             elif args.spontaneous:
                 out = model.step_spontaneous()
