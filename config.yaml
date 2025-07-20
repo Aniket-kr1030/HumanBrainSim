@@ -1,0 +1,4 @@
+input_dim: 8
+cortex_layers: [8, 4]
+hippocampus_dim: 4
+ach_thresh: 0.5

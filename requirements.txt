@@ -1,0 +1,11 @@
+numpy
+scipy
+opencv-python
+sounddevice
+pyyaml
+streamlit
+speechrecognition
+pyttsx3
+torch
+coremltools
+
