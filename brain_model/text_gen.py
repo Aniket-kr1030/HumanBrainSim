@@ -7,10 +7,17 @@ class MarkovResponder:
     def __init__(self):
         self.transitions = defaultdict(list)
         self.start_words = []
-        # seed with a small corpus so responses are not empty
-        self.add_sentence("hello there")
-        self.add_sentence("how are you doing today")
-        self.add_sentence("this is a demo")
+        # seed with a small corpus so responses are not empty and vary a bit
+        default_corpus = [
+            "hello there",
+            "how are you doing today",
+            "it's nice to meet you",
+            "let's discuss your plans",
+            "tell me about your projects",
+            "what else is on your mind",
+        ]
+        for line in default_corpus:
+            self.add_sentence(line)
 
     def add_sentence(self, sentence: str) -> None:
         words = sentence.lower().split()
