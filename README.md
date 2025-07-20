@@ -40,8 +40,8 @@ can simply rely on the printed metrics.
 
 For a simple text-only interface without camera or microphone, launch with
 the `--text` option. Type your messages and the model will respond by
-recalling the most similar sentence stored in its hippocampal memory. Enter
-`quit` or `exit` to stop the program.
+recalling the most similar sentence stored in its hippocampal memory using
+cosine similarity. Enter `quit` or `exit` to stop the program.
 
 ```bash
 python run_model.py --config config.yaml --text

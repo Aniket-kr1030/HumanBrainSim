@@ -13,6 +13,12 @@ class BrainResponder:
     def respond(self, cue: np.ndarray) -> str:
         if not self.memory:
             return "..."
-        sims = [float(np.dot(vec, cue)) for vec, _ in self.memory]
+        cue_norm = cue.astype(float)
+        cue_norm /= np.linalg.norm(cue_norm) + 1e-8
+        sims = []
+        for vec, _ in self.memory:
+            v = vec.astype(float)
+            v /= np.linalg.norm(v) + 1e-8
+            sims.append(float(np.dot(v, cue_norm)))
         idx = int(np.argmax(sims))
         return self.memory[idx][1]
