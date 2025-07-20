@@ -21,4 +21,4 @@ class LifelongLearningModule:
         return float(self.lam * np.sum(self.fisher * diff ** 2))
 
     def consolidation_replay(self, memory, num_patterns: int):
-        return memory.recall(np.random.randn(memory.dim), steps=num_patterns)
+        return memory.recall(np.random.randn(memory.dim), k=num_patterns)

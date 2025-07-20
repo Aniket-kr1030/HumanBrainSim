@@ -89,7 +89,8 @@ class HierarchicalBrainModel:
             self.hippocampus.store(activations)
             stored = True
 
-        recall = self.hippocampus.recall(activations)
+        k = min(3, len(self.hippocampus.store_matrix))
+        recall = self.hippocampus.recall(activations, k=k)
         self.pruning.connections = self.cortex.layers[-1].weights
         self.pruning.prune(self.pruning.prune_rate)
         self.rewiring.connections = self.pruning.connections

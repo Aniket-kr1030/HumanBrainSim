@@ -44,8 +44,10 @@ can simply rely on the printed metrics.
 For a simple text-only interface without camera or microphone, launch with
 the `--text` option. Type your messages and the model processes them
 through the cortex and hippocampus. When the acetylcholine level is high
-enough, the activations are stored in memory. Responses combine the closest
-recalled sentence with a short Markov-chain continuation so the agent adds
+enough, the activations are stored in memory. Replies are retrieved using
+cosine similarity over stored activations and average the top three matches.
+The selected sentence is combined with a short Markov-chain continuation so
+the agent adds
 its own thoughts. Enter `quit` or `exit` to stop the program.
 
 ```bash
