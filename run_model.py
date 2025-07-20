@@ -3,26 +3,7 @@ import yaml
 import numpy as np
 from brain_model.brain import HierarchicalBrainModel
 from brain_model.speech import SpeechRecognitionModule, TextToSpeechModule
-import random
-
-
-def generate_response(text: str) -> str:
-    """Return a very simple rule-based reply."""
-    t = text.strip().lower()
-    if not t:
-        return "I'm listening."
-    greetings = {"hello", "hi", "hey"}
-    if any(g in t for g in greetings):
-        return random.choice([
-            "Hello!", "Hi there!", "Hey, how can I help?",
-        ])
-    if t.endswith("?"):
-        return "That's an interesting question."
-    if "bye" in t:
-        return "Goodbye!"
-    return random.choice([
-        "I see.", "Tell me more.", "Interesting.",
-    ])
+from brain_model.text_gen import MarkovResponder
 
 
 def main():
@@ -73,6 +54,7 @@ def main():
     stt = None
     tts = None
     record_audio = None
+    responder = MarkovResponder()
     if args.speech:
         from brain_model.hardware_interface import record_audio as _rec
         stt = SpeechRecognitionModule()
@@ -97,7 +79,9 @@ def main():
                 x = x.astype(float) / 255.0
                 next_x = np.random.randn(cfg["input_dim"])
                 out = model.step(x, reward=0.0, next_x=next_x)
-                response = generate_response(user_text)
+                responder.add_sentence(user_text)
+                response = responder.generate()
+                responder.add_sentence(response)
                 print("Model:", response)
                 if args.speech:
                     tts.speak(response)
@@ -111,7 +95,9 @@ def main():
                 next_x = np.random.randn(cfg["input_dim"])
                 out = model.step(x, reward=0.0, next_x=next_x)
                 if text:
-                    response = generate_response(text)
+                    responder.add_sentence(text)
+                    response = responder.generate()
+                    responder.add_sentence(response)
                     tts.speak(response)
             elif args.spontaneous:
                 out = model.step_spontaneous()

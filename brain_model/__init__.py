@@ -10,6 +10,7 @@ from .lifelong import LifelongLearningModule
 from .interneuron_microcircuit import InterneuronMicrocircuitModule
 from .dashboard import DashboardServer
 from .speech import SpeechRecognitionModule, TextToSpeechModule
+from .text_gen import MarkovResponder
 from .hardware_interface import (
     open_camera,
     read_frame,
@@ -30,6 +31,7 @@ __all__ = [
     "DashboardServer",
     "SpeechRecognitionModule",
     "TextToSpeechModule",
+    "MarkovResponder",
     "open_camera",
     "read_frame",
     "show_frame",

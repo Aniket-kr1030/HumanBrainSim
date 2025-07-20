@@ -39,8 +39,9 @@ SSH or without GUI support), the program now continues headlessly and you
 can simply rely on the printed metrics.
 
 For a simple text-only interface without camera or microphone, launch with
-the `--text` option. Type your messages and the model will reply with a
-simple generated response until you type `quit` or `exit`.
+the `--text` option. Type your messages and the model will respond using a
+lightweight Markov chain built from the conversation so far. Enter `quit`
+or `exit` to stop the program.
 
 ```bash
 python run_model.py --config config.yaml --text
