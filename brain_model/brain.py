@@ -11,6 +11,7 @@ from .homeostasis import HomeostasisModule
 from .social import SocialModule
 from .generative_replay import GenerativeReplayModule
 from .thought_generator import ThoughtGeneratorModule
+from .synaptic_plasticity import SynapticPruningModule, SynapticRewiringModule
 from .attention import AttentionModule
 from .meta_learning import MetaLearningModule
 from .energy_monitor import EnergyMonitorModule
@@ -39,6 +40,9 @@ class HierarchicalBrainModel:
         self.chemicals = ChemicalCompositionModule()
         self.microcircuit = InterneuronMicrocircuitModule(cortex_layers[-1])
         self.dashboard = DashboardServer()
+        last_weights = self.cortex.layers[-1].weights
+        self.pruning = SynapticPruningModule(last_weights)
+        self.rewiring = SynapticRewiringModule(last_weights)
         self.microcircuit.connect()
         self.ach_thresh = ach_thresh
 
@@ -46,6 +50,14 @@ class HierarchicalBrainModel:
         """Process one timestep of external or internal input."""
         if next_x is None:
             next_x = self.default_mode.step_spontaneous()
+            replay = self.replay.replay(1, noise_sigma=0.05)[0]
+            if replay.shape[0] != next_x.shape[0]:
+                if replay.shape[0] < next_x.shape[0]:
+                    replay = np.pad(replay, (0, next_x.shape[0] - replay.shape[0]))
+                else:
+                    replay = replay[: next_x.shape[0]]
+            thought = self.thought_gen.run_cycle(1)[0]
+            next_x = next_x + 0.5 * replay + 0.5 * thought
 
         activations, errors = self.cortex.forward(x)
         next_act, _ = self.cortex.forward(next_x)
@@ -57,6 +69,7 @@ class HierarchicalBrainModel:
         scale = self.energy_monitor.check_and_scale()
         activations = activations * scale
 
+        self.homeostasis.update_states({'energy': -0.01})
         drive = self.homeostasis.compute_drive_signal()
         predictions = self.social.predict_others(activations)
         social_reward = self.social.compute_social_reward(predictions, next_act)
@@ -65,6 +78,10 @@ class HierarchicalBrainModel:
 
         td_error = self.critic.td_update(activations, total_reward, next_act)
         self.dopamine.step(td_error)
+        self.cortex.layers[-1].weights = self.meta.outer_update(
+            self.cortex.layers[-1].weights,
+            td_error * self.cortex.layers[-1].weights,
+        )
         ach_level = self.ach.step(0.0)
 
         stored = False
@@ -73,6 +90,11 @@ class HierarchicalBrainModel:
             stored = True
 
         recall = self.hippocampus.recall(activations)
+        self.pruning.connections = self.cortex.layers[-1].weights
+        self.pruning.prune(self.pruning.prune_rate)
+        self.rewiring.connections = self.pruning.connections
+        self.rewiring.rewire(1)
+        self.cortex.layers[-1].weights = self.rewiring.connections
         penalty = self.lifelong.compute_ewc_penalty(self.cortex.layers[-1].weights)
         self.dashboard.update_plots({"reward": total_reward, "penalty": penalty})
         return {

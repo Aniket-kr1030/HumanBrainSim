@@ -24,6 +24,9 @@ python run_model.py --config config.yaml --capacity 1.5
 ```
 
 During execution a minimal dashboard prints updates about reward and EWC penalty.
+The model also generates internal activity using a default mode network and
+generative replay of hippocampal memories. Synaptic pruning and rewiring keep
+the network dynamic over time.
 
 For real-time two-way speech and camera interaction, run:
 
